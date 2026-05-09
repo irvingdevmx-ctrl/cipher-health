@@ -1,0 +1,298 @@
+/* ============================================================
+   CipherHealth - Estilos base
+   Mobile-first, dark-mode por defecto.
+   La paleta vive en variables CSS (:root) para personalizar facil.
+   Tailwind via CDN consume estas variables (ver index.html).
+   ============================================================ */
+
+/* ---------- Paleta (formato R G B para usar con `rgb(var(--c-x) / alpha)`) ---------- */
+:root {
+  /* Fondos */
+  --c-bg:          11 15 20;     /* #0b0f14  fondo general */
+  --c-surface:     16 21 28;     /* #10151c  tarjetas, navegacion */
+  --c-surface-2:   31 41 55;     /* #1f2937  hover / chips */
+  --c-border:      31 45 60;     /* #1f2d3c  bordes sutiles */
+
+  /* Tipografia */
+  --c-text:        226 232 240;  /* #e2e8f0  texto principal */
+  --c-muted:       148 163 184;  /* #94a3b8  texto secundario */
+
+  /* Marca */
+  --c-brand:        16 185 129;  /* #10b981  verde menta principal */
+  --c-brand-strong:  4 120  87;  /* #047857  acento mas profundo */
+
+  /* Estados */
+  --c-danger:      239  68  68;  /* #ef4444 */
+  --c-warning:     234 179   8;  /* #eab308 */
+
+  /* Tamanos / radios / sombras */
+  --tap-min:        48px;        /* WCAG / Material: tamano minimo para tap */
+  --thumb-btn-h:    56px;
+  --nav-btn-h:      60px;
+  --radius-card:    1rem;
+  --shadow-soft:    0 8px 24px -8px rgba(0,0,0,0.5);
+}
+
+/* Permite forzar tema claro mas adelante (Fase 6) */
+html.light {
+  --c-bg:          245 247 250;
+  --c-surface:     255 255 255;
+  --c-surface-2:   241 245 249;
+  --c-border:      226 232 240;
+  --c-text:         15  23  42;
+  --c-muted:       100 116 139;
+}
+
+/* ---------- Reset ligero / comportamiento tactil ---------- */
+* { -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+}
+
+/* Asegurar que cualquier elemento interactivo cumpla el minimo de 48px */
+button,
+[role="button"],
+.thumb-btn,
+.nav-btn {
+  min-height: var(--tap-min);
+}
+
+/* ---------- Botones grandes para el pulgar ---------- */
+.thumb-btn {
+  min-height: var(--thumb-btn-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-card);
+  padding: 0.75rem 1rem;
+  transition: transform 0.08s ease, background-color 0.15s ease;
+  color: rgb(var(--c-text));
+  font-weight: 500;
+}
+
+.thumb-btn:focus-visible {
+  outline: 2px solid rgb(var(--c-brand));
+  outline-offset: 2px;
+}
+
+.thumb-btn:active { transform: scale(0.98); }
+
+/* ---------- Bottom nav ---------- */
+.nav-btn {
+  min-height: var(--nav-btn-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 11px;
+  color: rgb(var(--c-muted));
+  transition: color 0.15s ease, transform 0.08s ease;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.nav-btn i { transition: transform 0.15s ease; }
+.nav-btn:active { transform: scale(0.96); }
+
+.nav-btn[aria-current="page"] {
+  color: rgb(var(--c-brand));
+}
+.nav-btn[aria-current="page"] i {
+  transform: translateY(-1px);
+  filter: drop-shadow(0 0 8px rgb(var(--c-brand) / 0.45));
+}
+
+/* ---------- Transiciones de vista ---------- */
+.view {
+  animation: fadeUp 0.22s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Toast ---------- */
+#toast.show {
+  display: flex;
+  animation: toastIn 0.2s ease both;
+}
+#toast > div {
+  background: rgb(var(--c-surface) / 0.96);
+  border: 1px solid rgb(var(--c-border));
+  color: rgb(var(--c-text));
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  box-shadow: var(--shadow-soft);
+  max-width: 90vw;
+  text-align: center;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ---------- Scrollbar discreto ---------- */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgb(var(--c-surface-2)); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--c-border)); }
+
+/* ---------- Pequeno ajuste para pantallas anchas (tablet/desktop) ---------- */
+@media (min-width: 640px) {
+  #app { box-shadow: 0 0 0 1px rgb(var(--c-border)); }
+}
+
+/* ============================================================
+   Formulario "Registrar" (Fase 3)
+   ============================================================ */
+
+/* --- Botones de intensidad 1..10 (color verde -> rojo via JS) --- */
+.intensity-btn {
+  --c: 16 185 129;          /* color base, sobrescrito inline por JS */
+  position: relative;
+  min-height: 56px;
+  border-radius: 14px;
+  background: rgb(var(--c) / 0.14);
+  color: rgb(var(--c));
+  border: 1px solid rgb(var(--c) / 0.35);
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+.intensity-btn:active { transform: scale(0.94); }
+
+.intensity-btn[aria-checked="true"] {
+  background: rgb(var(--c));
+  color: rgb(var(--c-bg));
+  border-color: rgb(var(--c));
+  box-shadow: 0 6px 18px -8px rgb(var(--c) / 0.7),
+              0 0 0 3px rgb(var(--c) / 0.25);
+  transform: scale(1.02);
+}
+
+/* --- Chips de tipo de sintoma --- */
+.chip {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgb(var(--c-surface-2));
+  color: rgb(var(--c-text));
+  border: 1px solid rgb(var(--c-border));
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.chip:active { transform: scale(0.96); }
+
+.chip[aria-checked="true"] {
+  background: rgb(var(--c-brand));
+  color: rgb(var(--c-bg));
+  border-color: rgb(var(--c-brand));
+}
+
+.chip[aria-checked="true"] i { color: rgb(var(--c-bg)); }
+
+/* --- Boton guardar: estados --- */
+#btn-save[data-state="saving"] [data-save-state="idle"],
+#btn-save[data-state="saving"] [data-save-state="done"]   { display: none !important; }
+#btn-save[data-state="saving"] [data-save-state="saving"] { display: inline-flex !important; }
+
+#btn-save[data-state="done"] [data-save-state="idle"],
+#btn-save[data-state="done"] [data-save-state="saving"]   { display: none !important; }
+#btn-save[data-state="done"] [data-save-state="done"]     { display: inline-flex !important; }
+
+#btn-save[data-state="done"] {
+  background: rgb(var(--c-brand-strong));
+  animation: savedPulse 0.5s ease;
+}
+@keyframes savedPulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* ============================================================
+   Historial (Fase 4)
+   ============================================================ */
+
+.history-item {
+  --c: 16 185 129; /* color sobrescrito por JS segun intensidad */
+  background: rgb(var(--c-surface));
+  border: 1px solid rgb(var(--c-border));
+  border-left: 4px solid rgb(var(--c));
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  animation: fadeUp 0.18s ease both;
+}
+
+.history-item .h-intensity {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgb(var(--c) / 0.18);
+  color: rgb(var(--c));
+  font-weight: 800;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.history-item .h-meta { min-width: 0; }
+.history-item .h-type {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(var(--c-text));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.history-item .h-when {
+  font-size: 11px;
+  color: rgb(var(--c-muted));
+  margin-top: 2px;
+}
+.history-item .h-notes {
+  font-size: 12px;
+  color: rgb(var(--c-muted));
+  margin-top: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.history-item .h-delete {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: transparent;
+  color: rgb(var(--c-muted));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
+  cursor: pointer;
+  border: 0;
+}
+.history-item .h-delete:hover {
+  background: rgb(var(--c-danger) / 0.12);
+  color: rgb(var(--c-danger));
+}
+.history-item .h-delete:active { transform: scale(0.92); }

@@ -1,0 +1,314 @@
+!-- ============ View: Historial ============ -->
+        <section data-view="history" class="view hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-brand" aria-hidden="true"></i>
+              Historial
+            </h2>
+            <span id="history-count" class="text-xs text-muted tabular-nums">0 registros</span>
+          </div>
+
+          <!-- Estado vacio -->
+          <div id="history-empty" class="rounded-2xl bg-surface border border-border p-6 text-center hidden">
+            <i class="fa-regular fa-folder-open text-3xl text-muted" aria-hidden="true"></i>
+            <p class="text-sm text-muted mt-3">
+              Aún no hay registros. Anota tu primer episodio en
+              <button data-action="goto" data-view="log" class="text-brand underline underline-offset-2">Registrar</button>.
+            </p>
+          </div>
+
+          <!-- Lista de registros -->
+          <ul id="history-list" class="space-y-2" aria-live="polite"></ul>
+        </section>
+
+        <!-- ============ View: Estadísticas ============ -->
+        <section data-view="stats" class="view hidden space-y-4">
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <i class="fa-solid fa-chart-line text-brand" aria-hidden="true"></i>
+            Estadísticas
+          </h2>
+
+          <!-- Contadores rapidos -->
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-xl bg-surface border border-border p-3">
+              <p class="text-[10px] uppercase tracking-wider text-muted">Hoy</p>
+              <p data-stat="today" class="text-2xl font-semibold text-text mt-1">0</p>
+            </div>
+            <div class="rounded-xl bg-surface border border-border p-3">
+              <p class="text-[10px] uppercase tracking-wider text-muted">7 días</p>
+              <p data-stat="week" class="text-2xl font-semibold text-text mt-1">0</p>
+            </div>
+            <div class="rounded-xl bg-surface border border-border p-3">
+              <p class="text-[10px] uppercase tracking-wider text-muted">Total</p>
+              <p data-stat="total" class="text-2xl font-semibold text-text mt-1">0</p>
+            </div>
+          </div>
+
+          <!-- Resumen semana -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="rounded-xl bg-surface border border-border p-3">
+              <p class="text-[10px] uppercase tracking-wider text-muted">Promedio (7 días)</p>
+              <p class="mt-1 flex items-baseline gap-1">
+                <span data-stat="avg" class="text-2xl font-semibold text-text tabular-nums">—</span>
+                <span class="text-xs text-muted">/10</span>
+              </p>
+            </div>
+            <div class="rounded-xl bg-surface border border-border p-3">
+              <p class="text-[10px] uppercase tracking-wider text-muted">Más frecuente</p>
+              <p data-stat="top" class="text-base font-semibold text-text mt-1 truncate">—</p>
+              <p data-stat="top-count" class="text-[10px] text-muted tabular-nums">—</p>
+            </div>
+          </div>
+
+          <!-- Grafico -->
+          <div class="rounded-2xl bg-surface border border-border p-4">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-semibold text-text">Intensidad · últimos 7 días</p>
+              <span class="text-[10px] text-muted">promedio diario</span>
+            </div>
+            <div class="mt-3 relative h-56">
+              <canvas id="chart-intensity" aria-label="Gráfica de intensidad de los últimos 7 días"></canvas>
+            </div>
+            <p id="chart-empty" class="text-xs text-muted text-center mt-3 hidden">
+              Aún no hay datos suficientes para mostrar la gráfica.
+            </p>
+          </div>
+        </section>
+
+        <!-- View: Ajustes -->
+        <section data-view="settings" class="view hidden space-y-3">
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-brand" aria-hidden="true"></i>
+            Ajustes
+          </h2>
+
+          <div
+            class="rounded-2xl bg-surface border border-border divide-y divide-border"
+          >
+            <div class="flex items-center justify-between px-4 py-4">
+              <div class="flex items-center gap-3">
+                <i
+                  class="fa-solid fa-database text-muted"
+                  aria-hidden="true"
+                ></i>
+                <div>
+                  <p class="text-sm font-medium text-text">Almacenamiento</p>
+                  <p class="text-xs text-muted" id="settings-storage-detail">
+                    Detectando…
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between px-4 py-4">
+              <div class="flex items-center gap-3">
+                <i
+                  class="fa-solid fa-shield-halved text-muted"
+                  aria-hidden="true"
+                ></i>
+                <div>
+                  <p class="text-sm font-medium text-text">Modo privado</p>
+                  <p class="text-xs text-muted">
+                    Sin red, sin telemetría, sin cuentas.
+                  </p>
+                </div>
+              </div>
+              <i
+                class="fa-solid fa-circle-check text-brand"
+                aria-hidden="true"
+              ></i>
+            </div>
+          </div>
+
+          <!-- ── Instalar app ── -->
+          <div id="pwa-install-card" class="rounded-2xl bg-surface border border-brand/40 overflow-hidden hidden">
+            <div class="p-4 flex items-center gap-4">
+              <img src="icons/icon-192.svg" alt="" class="w-12 h-12 rounded-2xl flex-shrink-0" aria-hidden="true" />
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-text">Instalar CipherHealth</p>
+                <p class="text-xs text-muted mt-0.5">Funciona sin conexión, acceso desde la pantalla de inicio.</p>
+              </div>
+              <button id="btn-pwa-install" class="thumb-btn px-4 bg-brand text-bg hover:bg-brand-strong border-0 flex-shrink-0" style="min-width:0;width:auto;height:44px">
+                Instalar
+              </button>
+            </div>
+          </div>
+
+          <!-- ── Exportación ── -->
+          <div class="rounded-2xl bg-surface border border-border overflow-hidden">
+            <div class="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <i class="fa-solid fa-file-export text-brand" aria-hidden="true"></i>
+              <p class="text-sm font-semibold text-text">Exportar mis datos</p>
+            </div>
+            <div class="p-4 space-y-3">
+              <p class="text-xs text-muted leading-relaxed">
+                Descarga una copia de todos tus registros. Ningún dato sale de tu dispositivo — el archivo se genera aquí mismo.
+              </p>
+              <div class="flex flex-col gap-2">
+                <button id="btn-export-json" class="thumb-btn w-full bg-brand/10 text-brand border border-brand/40 hover:bg-brand/20">
+                  <i class="fa-solid fa-file-code mr-2" aria-hidden="true"></i>
+                  Descargar JSON&thinsp;<span class="text-[10px] opacity-70 ml-1">· copia de seguridad</span>
+                </button>
+                <button id="btn-export-csv" class="thumb-btn w-full bg-brand/10 text-brand border border-brand/40 hover:bg-brand/20">
+                  <i class="fa-solid fa-file-csv mr-2" aria-hidden="true"></i>
+                  Descargar CSV&thinsp;<span class="text-[10px] opacity-70 ml-1">· para tu médico</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Apoyar al proyecto ── -->
+          <div class="rounded-2xl bg-surface border border-border overflow-hidden">
+            <div class="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <i class="fa-solid fa-heart text-red-400" aria-hidden="true"></i>
+              <p class="text-sm font-semibold text-text">Apoyar al proyecto</p>
+            </div>
+            <div class="p-4 space-y-3">
+              <p class="text-xs text-muted leading-relaxed">
+                CipherHealth es gratuita y sin anuncios. Si te ayuda a llevar mejor tu día a día, puedes invitarme un café — es opcional y se agradece un montón.
+              </p>
+              <a
+                id="btn-kofi"
+                href="https://ko-fi.com/irvingdevmx"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="thumb-btn w-full flex items-center justify-center gap-2 bg-[#FF5E5B]/10 text-[#FF5E5B] border border-[#FF5E5B]/40 hover:bg-[#FF5E5B]/20 no-underline"
+              >
+                <i class="fa-solid fa-mug-hot" aria-hidden="true"></i>
+                Invitar un café en Ko-fi
+              </a>
+            </div>
+          </div>
+
+          <!-- ── Recursos recomendados ── -->
+          <div class="rounded-2xl bg-surface border border-border overflow-hidden">
+            <div class="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <i class="fa-solid fa-bookmark text-brand" aria-hidden="true"></i>
+              <p class="text-sm font-semibold text-text">Recursos recomendados</p>
+            </div>
+            <ul class="divide-y divide-border" id="resources-list">
+              <li>
+                <a
+                  href="https://www.iasp-pain.org/resources/fact-sheets/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-colors no-underline group"
+                >
+                  <span class="w-9 h-9 rounded-xl bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-stethoscope text-brand text-sm" aria-hidden="true"></i>
+                  </span>
+                  <span class="flex-1 min-w-0">
+                    <span class="block text-sm font-medium text-text group-hover:text-brand transition-colors">IASP — Fichas sobre dolor crónico</span>
+                    <span class="block text-[11px] text-muted mt-0.5 truncate">iasp-pain.org · Información médica oficial</span>
+                  </span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-xs text-muted flex-shrink-0" aria-hidden="true"></i>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.painscale.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-colors no-underline group"
+                >
+                  <span class="w-9 h-9 rounded-xl bg-brand/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-chart-simple text-brand text-sm" aria-hidden="true"></i>
+                  </span>
+                  <span class="flex-1 min-w-0">
+                    <span class="block text-sm font-medium text-text group-hover:text-brand transition-colors">Pain Scale — Seguimiento de dolor</span>
+                    <span class="block text-[11px] text-muted mt-0.5 truncate">painscale.com · App complementaria</span>
+                  </span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-xs text-muted flex-shrink-0" aria-hidden="true"></i>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.amazon.com/dp/0593541537?tag=cipherhealth-20"
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  class="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-colors no-underline group"
+                >
+                  <span class="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-brands fa-amazon text-amber-400 text-sm" aria-hidden="true"></i>
+                  </span>
+                  <span class="flex-1 min-w-0">
+                    <span class="block text-sm font-medium text-text group-hover:text-brand transition-colors">Libro: Explicando el dolor</span>
+                    <span class="block text-[11px] text-muted mt-0.5 truncate">Amazon · Enlace de afiliado</span>
+                  </span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-xs text-muted flex-shrink-0" aria-hidden="true"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- ── Zona peligrosa ── -->
+          <button
+            id="btn-wipe"
+            class="thumb-btn w-full bg-danger/10 text-danger border border-danger/40 hover:bg-danger/20"
+          >
+            <i class="fa-solid fa-trash-can mr-2" aria-hidden="true"></i>
+            Borrar todos los datos locales
+          </button>
+        </section>
+      </main>
+
+      <!-- ===== Bottom Navigation (4 tabs, thumb-friendly) ===== -->
+      <nav
+        class="fixed bottom-0 inset-x-0 z-30 bg-surface/95 backdrop-blur border-t border-border"
+        aria-label="Navegación principal"
+      >
+        <div class="max-w-screen-sm mx-auto grid grid-cols-4">
+          <button
+            data-action="goto"
+            data-view="log"
+            class="nav-btn"
+            aria-label="Registrar"
+          >
+            <i class="fa-solid fa-plus text-lg" aria-hidden="true"></i>
+            <span>Registrar</span>
+          </button>
+          <button
+            data-action="goto"
+            data-view="history"
+            class="nav-btn"
+            aria-label="Historial"
+          >
+            <i
+              class="fa-solid fa-clock-rotate-left text-lg"
+              aria-hidden="true"
+            ></i>
+            <span>Historial</span>
+          </button>
+          <button
+            data-action="goto"
+            data-view="stats"
+            class="nav-btn"
+            aria-label="Estadísticas"
+          >
+            <i class="fa-solid fa-chart-line text-lg" aria-hidden="true"></i>
+            <span>Estadísticas</span>
+          </button>
+          <button
+            data-action="goto"
+            data-view="settings"
+            class="nav-btn"
+            aria-label="Ajustes"
+          >
+            <i class="fa-solid fa-sliders text-lg" aria-hidden="true"></i>
+            <span>Ajustes</span>
+          </button>
+        </div>
+        <div class="h-[env(safe-area-inset-bottom)]"></div>
+      </nav>
+    </div>
+
+    <!-- Toast container -->
+    <div
+      id="toast"
+      class="fixed left-1/2 -translate-x-1/2 bottom-24 z-40 hidden"
+    ></div>
+
+    <!-- ================== Scripts (orden importa) ================== -->
+    <script src="db.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
