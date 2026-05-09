@@ -1,4 +1,218 @@
-!-- ============ View: Historial ============ -->
+<!doctype html>
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- ================== Meta tags PWA ================== -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b0f14" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="CipherHealth" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="CipherHealth" />
+    <meta
+      name="description"
+      content="CipherHealth - Rastreo privado de sintomas y dolor cronico. 100% local en tu dispositivo, sin rastreadores."
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex,nofollow" />
+
+    <title>CipherHealth</title>
+
+    <!-- Manifest PWA -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- Icono (SVG para todos los contextos) -->
+    <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/icon-512.svg" />
+
+    <!-- ================== CDNs ================== -->
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Tailwind se configura para leer las variables CSS, asi la paleta vive en :root
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              bg: "rgb(var(--c-bg) / <alpha-value>)",
+              surface: "rgb(var(--c-surface) / <alpha-value>)",
+              surface2: "rgb(var(--c-surface-2) / <alpha-value>)",
+              border: "rgb(var(--c-border) / <alpha-value>)",
+              text: "rgb(var(--c-text) / <alpha-value>)",
+              muted: "rgb(var(--c-muted) / <alpha-value>)",
+              brand: "rgb(var(--c-brand) / <alpha-value>)",
+              "brand-strong": "rgb(var(--c-brand-strong) / <alpha-value>)",
+              danger: "rgb(var(--c-danger) / <alpha-value>)",
+              warning: "rgb(var(--c-warning) / <alpha-value>)",
+            },
+            fontFamily: {
+              sans: [
+                "system-ui",
+                "-apple-system",
+                "Segoe UI",
+                "Roboto",
+                "sans-serif",
+              ],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Dexie.js (IndexedDB) -->
+    <script src="https://unpkg.com/dexie@4.0.8/dist/dexie.min.js"></script>
+
+    <!-- FontAwesome 6 Free -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- Chart.js (UMD, sin adaptadores extra) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+    <!-- ================== Estilos propios ================== -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body class="bg-bg text-text font-sans min-h-screen antialiased select-none">
+    <!-- ================== App Shell ================== -->
+    <div id="app" class="flex flex-col min-h-screen max-w-screen-sm mx-auto">
+      <!-- ===== Header ===== -->
+      <header
+        class="sticky top-0 z-20 bg-bg/90 backdrop-blur border-b border-border"
+      >
+        <div class="flex items-center justify-between gap-3 px-4 h-14">
+          <div class="flex items-center gap-2 min-w-0">
+            <span
+              class="inline-flex w-8 h-8 rounded-lg bg-brand items-center justify-center shrink-0"
+            >
+              <i
+                class="fa-solid fa-shield-heart text-bg text-sm"
+                aria-hidden="true"
+              ></i>
+            </span>
+            <div class="min-w-0">
+              <h1
+                class="text-base font-semibold tracking-tight truncate leading-none"
+              >
+                CipherHealth
+              </h1>
+              <p
+                class="text-[10px] uppercase tracking-widest text-muted leading-none mt-1"
+              >
+                v<span id="app-version">0.6.0</span> · privado
+              </p>
+            </div>
+          </div>
+
+          <button
+            id="btn-storage-status"
+            class="text-xs px-2.5 h-9 min-w-[44px] rounded-md bg-surface2 text-muted hover:text-text active:scale-95 transition flex items-center gap-1.5"
+            aria-label="Estado del almacenamiento local"
+          >
+            <i
+              id="storage-icon"
+              class="fa-solid fa-circle-notch fa-spin"
+              aria-hidden="true"
+            ></i>
+            <span id="storage-indicator" class="hidden sm:inline">…</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ===== Main / Content area (las vistas se conmutan via JS) ===== -->
+      <main id="main" class="flex-1 px-4 pt-4 pb-28">
+        <!-- View: Registrar (vista por defecto) -->
+        <section data-view="log" class="view space-y-5">
+
+          <!-- Hero -->
+          <div class="rounded-2xl bg-gradient-to-br from-brand-strong to-brand p-5 shadow-lg">
+            <p class="text-xs uppercase tracking-widest text-bg/70 font-semibold">Registrar episodio</p>
+            <h2 class="text-2xl font-semibold mt-1 text-bg">¿Cómo te sientes ahora?</h2>
+            <p class="text-sm mt-2 text-bg/80 leading-relaxed">
+              La fecha y hora se asignan automáticamente al guardar. Todo queda en tu dispositivo.
+            </p>
+          </div>
+
+          <!-- Bloque: Intensidad -->
+          <div class="rounded-2xl bg-surface border border-border p-4">
+            <div class="flex items-baseline justify-between">
+              <label class="text-sm font-semibold text-text">Intensidad</label>
+              <span id="intensity-help" class="text-xs text-muted">Toca un valor del 1 al 10</span>
+            </div>
+            <div id="intensity-grid" class="mt-3 grid grid-cols-5 gap-2" role="radiogroup" aria-label="Intensidad del 1 al 10"></div>
+            <div class="mt-3 flex items-center justify-between text-[11px] text-muted">
+              <span><i class="fa-regular fa-face-smile mr-1"></i>Leve</span>
+              <span>Severo<i class="fa-regular fa-face-tired ml-1"></i></span>
+            </div>
+          </div>
+
+          <!-- Bloque: Tipo de sintoma -->
+          <div class="rounded-2xl bg-surface border border-border p-4">
+            <div class="flex items-baseline justify-between">
+              <label class="text-sm font-semibold text-text">Tipo de síntoma</label>
+              <span id="type-help" class="text-xs text-muted">Elige uno</span>
+            </div>
+            <div id="type-chips" class="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Tipo de síntoma"></div>
+          </div>
+
+          <!-- Bloque: Notas -->
+          <div class="rounded-2xl bg-surface border border-border p-4">
+            <div class="flex items-baseline justify-between">
+              <label for="notes" class="text-sm font-semibold text-text">Notas <span class="text-muted font-normal">(opcional)</span></label>
+              <span id="notes-counter" class="text-xs text-muted tabular-nums">0/4000</span>
+            </div>
+            <textarea
+              id="notes"
+              rows="3"
+              maxlength="4000"
+              placeholder="Disparadores, contexto, lo que estabas haciendo…"
+              class="mt-2 w-full resize-none bg-surface2 text-text placeholder:text-muted/70 border border-border rounded-xl p-3 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-brand/60"
+            ></textarea>
+          </div>
+
+          <!-- Boton de guardar -->
+          <button
+            id="btn-save"
+            type="button"
+            class="thumb-btn w-full bg-brand text-bg font-semibold text-base shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled
+            aria-disabled="true"
+          >
+            <span data-save-state="idle" class="inline-flex items-center justify-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i>
+              Guardar registro
+            </span>
+            <span data-save-state="saving" class="hidden items-center justify-center gap-2">
+              <i class="fa-solid fa-circle-notch fa-spin"></i>
+              Guardando…
+            </span>
+            <span data-save-state="done" class="hidden items-center justify-center gap-2">
+              <i class="fa-solid fa-circle-check"></i>
+              ¡Guardado!
+            </span>
+          </button>
+
+          <p class="text-[11px] text-muted text-center px-2 leading-relaxed">
+            <i class="fa-solid fa-shield-halved mr-1"></i>
+            Cero red. Los datos se quedan en este dispositivo.
+          </p>
+        </section>
+
+        <!-- ============ View: Historial ============ -->
         <section data-view="history" class="view hidden space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold flex items-center gap-2">
