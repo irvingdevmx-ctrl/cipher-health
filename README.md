@@ -1,4 +1,7 @@
 # Cipher Health
+utiliza el navegador e instalalo en tu dispositivo 
+
+https://irvingdevmx-ctrl.github.io/cipher-health/
 
 Rastreador de síntomas que funciona completamente offline.
 
